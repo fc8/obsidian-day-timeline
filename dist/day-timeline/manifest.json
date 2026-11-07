@@ -1,9 +1,9 @@
 {
   "id": "day-timeline",
-  "name": "日记时间线 Day Timeline",
+  "name": "Day Timeline",
   "version": "1.0.0",
-  "minAppVersion": "1.4.0",
+  "minAppVersion": "1.7.2",
   "description": "把日记按天排成一条时间线：图文混排、日历速览、那年今日。支持桌面端与手机端。",
-  "author": "WorkBuddy",
+  "author": "fc&WorkBuddy",
   "isDesktopOnly": false
 }

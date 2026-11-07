@@ -8,7 +8,7 @@
     "dev": "node esbuild.config.mjs",
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production && node scripts/sync-preview.mjs",
     "typecheck": "tsc -noEmit -skipLibCheck",
-    "test": "node tests/data.test.mjs && node tests/settings.test.mjs && node tests/create-diary.test.mjs"
+    "test": "node tests/data.test.mjs && node tests/settings.test.mjs && node tests/create-diary.test.mjs && node tests/api-compat.test.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",

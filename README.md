@@ -1,6 +1,6 @@
 # 日记时间线 · Day Timeline
 
-[![Obsidian](https://img.shields.io/badge/Obsidian-1.5+-7c3aed?style=flat-square)](https://obsidian.md) ![Desktop & Mobile](https://img.shields.io/badge/Desktop%20%26%20Mobile-2f80ed?style=flat-square)
+[![Obsidian](https://img.shields.io/badge/Obsidian-1.7.2+-7c3aed?style=flat-square)](https://obsidian.md) ![Desktop & Mobile](https://img.shields.io/badge/Desktop%20%26%20Mobile-2f80ed?style=flat-square)
 
 一个展示日记时间线的 Obsidian 插件：把日记按**一天**为单位聚合成一条可以一直往下滑的时光轴，左侧日期轴、右侧图文卡片，并配上日历速览与「那年今天」。
 
@@ -44,6 +44,8 @@
 ---
 
 ## 安装
+
+> 需要 Obsidian **1.7.2 或更高版本**：插件用到 `Workspace.revealLeaf()`（自 1.7.2 起提供），`manifest.json` 的 `minAppVersion` 与 `versions.json` 均按此声明。
 
 ### 方式一 · BRAT（自动更新，适合长期用）
 
@@ -134,7 +136,7 @@ npm install
 npm run dev        # 监听改动，生成带 sourcemap 的 main.js
 npm run build      # 类型检查 + 压缩打包 + 同步样式到预览页
 npm run typecheck  # 只做类型检查
-npm test           # 数据层 + 设置入口 + 写日记入口回归测试
+npm test           # 数据层 / 设置入口 / 写日记入口 / API 版本兼容性
 ```
 
 源码在 `src/`：`main.ts`（插件入口 / 命令 / 新建日记）、`data.ts`（扫描、日期解析、图片与摘要提取）、`view.ts`（时间线 / 日历 / 那年今天视图）、`settings.ts`（设置面板）、`utils.ts`（日期与 DOM 工具）。
