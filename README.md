@@ -1,4 +1,4 @@
-# 日记时间线 · Life Timeline
+# 日记时间线 · Day Timeline
 
 [![Obsidian](https://img.shields.io/badge/Obsidian-1.5+-7c3aed?style=flat-square)](https://obsidian.md) ![Desktop & Mobile](https://img.shields.io/badge/Desktop%20%26%20Mobile-2f80ed?style=flat-square)
 
@@ -51,8 +51,8 @@
 
 1. 设置 → 第三方插件 → 浏览，搜索安装 **BRAT** 并启用。
 2. 打开 BRAT 设置，点击 **Add Beta Plugin**（或命令面板搜索 `Add a beta plugin for testing`）。
-3. 填入仓库地址 `https://github.com/fc8/life-timeline`，版本选 `Latest version` 并确认。
-4. 回到「设置 → 第三方插件」确认「日记时间线 Life Timeline」已启用（BRAT 通常会自动启用）。
+3. 填入仓库地址 `https://github.com/fc8/obsidian-day-timeline`，版本选 `Latest version` 并确认。
+4. 回到「设置 → 第三方插件」确认「日记时间线 Day Timeline」已启用（BRAT 通常会自动启用）。
 5. 以后更新：在 BRAT 设置里点 **Check for updates**，或命令面板搜索 `Check for updates to all beta plugins`。
 
 ### 方式二 · 手动下载（最快，不需要额外插件）
@@ -63,7 +63,7 @@
 
 把仓库里的 [`dist/life-timeline/`](dist/life-timeline/) 文件夹复制到 `.obsidian/plugins/life-timeline/`，或者手动新建该目录并放入根目录的 `manifest.json`、`main.js`、`styles.css` 这三个文件。
 
-手动安装完成后，重启 Obsidian → 设置 → 第三方插件 → 启用「日记时间线 Life Timeline」；BRAT 安装通常会自动加载并启用，无需重启。
+手动安装完成后，重启 Obsidian → 设置 → 第三方插件 → 启用「日记时间线 Day Timeline」；BRAT 安装通常会自动加载并启用，无需重启。
 
 **手机 / 平板端**
 
