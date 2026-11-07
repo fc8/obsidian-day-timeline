@@ -7,7 +7,7 @@ import { collectEntries, diaryPathFor } from "./data";
 import type { DiaryEntry } from "./data";
 import { debounce, renderNoteTemplate } from "./utils";
 
-export default class LifeTimelinePlugin extends Plugin {
+export default class DayTimelinePlugin extends Plugin {
   settings: TimelineSettings = { ...DEFAULT_SETTINGS };
 
   private readonly delayedRefresh = debounce(() => this.refreshViews(), 1500);
@@ -20,27 +20,27 @@ export default class LifeTimelinePlugin extends Plugin {
     this.addRibbonIcon("calendar", "打开日记时间线", () => void this.activateView());
 
     this.addCommand({
-      id: "open-life-timeline",
+      id: "open-day-timeline",
       name: "打开日记时间线",
       callback: () => void this.activateView(),
     });
     this.addCommand({
-      id: "open-life-timeline-calendar",
+      id: "open-day-timeline-calendar",
       name: "打开日记日历",
       callback: () => void this.activateView("calendar"),
     });
     this.addCommand({
-      id: "life-timeline-on-this-day",
+      id: "day-timeline-on-this-day",
       name: "那年今天",
       callback: () => void this.activateView("onthisday"),
     });
     this.addCommand({
-      id: "life-timeline-write-today",
+      id: "day-timeline-write-today",
       name: "写今天的日记",
       callback: () => void this.createDiary(new Date()),
     });
     this.addCommand({
-      id: "life-timeline-random-diary",
+      id: "day-timeline-random-diary",
       name: "随机打开一篇日记",
       callback: () => void this.openRandomDiary(),
     });
@@ -77,7 +77,7 @@ export default class LifeTimelinePlugin extends Plugin {
       try {
         pool = await collectEntries(this.app, this.settings);
       } catch (error) {
-        console.error("[Life Timeline] 随机日记读取失败", error);
+        console.error("[Day Timeline] 随机日记读取失败", error);
         new Notice("日记时间线：读取日记失败");
         return;
       }
@@ -91,7 +91,7 @@ export default class LifeTimelinePlugin extends Plugin {
       await this.app.workspace.getLeaf(true).openFile(picked.file);
       new Notice(`随机日记 · ${picked.dateKey} · ${picked.title}`);
     } catch (error) {
-      console.error("[Life Timeline] 随机日记打开失败", error);
+      console.error("[Day Timeline] 随机日记打开失败", error);
       new Notice("日记时间线：打开日记失败");
     }
   }
@@ -130,7 +130,7 @@ export default class LifeTimelinePlugin extends Plugin {
         file = await this.app.vault.create(path, content);
         new Notice(`已创建日记 ${path}`);
       } catch (error) {
-        console.error("[Life Timeline] 创建日记失败", error);
+        console.error("[Day Timeline] 创建日记失败", error);
         new Notice("创建日记失败，请检查插件设置里的文件夹与日期格式");
         return;
       }

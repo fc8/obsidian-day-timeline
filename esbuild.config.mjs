@@ -21,7 +21,7 @@ const options = {
   treeShaking: true,
   minify: production,
   sourcemap: production ? false : "inline",
-  banner: { js: "/* Life Timeline · Obsidian plugin */" },
+  banner: { js: "/* Day Timeline · Obsidian plugin */" },
 };
 
 if (production) {

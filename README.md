@@ -57,18 +57,18 @@
 
 ### 方式二 · 手动下载（最快，不需要额外插件）
 
-下载仓库根目录的 [`life-timeline.zip`](life-timeline.zip)，解压出 `life-timeline/` 文件夹，整个放进 Obsidian 仓库的 `.obsidian/plugins/` 下。
+下载仓库根目录的 [`day-timeline.zip`](day-timeline.zip)，解压出 `day-timeline/` 文件夹，整个放进 Obsidian 仓库的 `.obsidian/plugins/` 下。
 
 ### 方式三 · 从源码复制
 
-把仓库里的 [`dist/life-timeline/`](dist/life-timeline/) 文件夹复制到 `.obsidian/plugins/life-timeline/`，或者手动新建该目录并放入根目录的 `manifest.json`、`main.js`、`styles.css` 这三个文件。
+把仓库里的 [`dist/day-timeline/`](dist/day-timeline/) 文件夹复制到 `.obsidian/plugins/day-timeline/`，或者手动新建该目录并放入根目录的 `manifest.json`、`main.js`、`styles.css` 这三个文件。
 
 手动安装完成后，重启 Obsidian → 设置 → 第三方插件 → 启用「日记时间线 Day Timeline」；BRAT 安装通常会自动加载并启用，无需重启。
 
 **手机 / 平板端**
 
 1. 先在电脑端装好并启用一次。
-2. 用你常用的同步方案（Remotely Save、Syncthing、iCloud、OneDrive、Git 等）把整个 `.obsidian/plugins/life-timeline/` 文件夹同步到手机仓库。
+2. 用你常用的同步方案（Remotely Save、Syncthing、iCloud、OneDrive、Git 等）把整个 `.obsidian/plugins/day-timeline/` 文件夹同步到手机仓库。
 3. 手机端 Obsidian → 设置 → 第三方插件 → 启用。插件不使用任何 Node / Electron / 文件系统 API，全部走 Obsidian 跨端 API，因此可以直接在 iOS / Android 上运行。
 
 > 两端都要各自启用一次第三方插件；`data.json`（设置）可以不参与同步，各设备独立保存。

@@ -1,6 +1,6 @@
 {
-  "id": "life-timeline",
-  "name": "日记时间线 Life Timeline",
+  "id": "day-timeline",
+  "name": "日记时间线 Day Timeline",
   "version": "1.0.0",
   "minAppVersion": "1.4.0",
   "description": "把日记按天排成一条时间线：图文混排、日历速览、那年今日。支持桌面端与手机端。",

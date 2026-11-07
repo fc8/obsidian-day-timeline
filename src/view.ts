@@ -1,6 +1,6 @@
 import { ItemView, Platform, setIcon } from "obsidian";
 import type { TFile, WorkspaceLeaf } from "obsidian";
-import type LifeTimelinePlugin from "./main";
+import type DayTimelinePlugin from "./main";
 import { collectEntries, groupDays } from "./data";
 import type { DiaryDay, DiaryEntry, DiaryImage } from "./data";
 import {
@@ -16,11 +16,11 @@ import {
   toDateKey,
 } from "./utils";
 
-export const VIEW_TYPE_TIMELINE = "life-timeline-view";
+export const VIEW_TYPE_TIMELINE = "day-timeline-view";
 export type ViewMode = "timeline" | "calendar" | "onthisday";
 
 export class TimelineView extends ItemView {
-  private plugin: LifeTimelinePlugin;
+  private plugin: DayTimelinePlugin;
   private entries: DiaryEntry[] = [];
   private filteredDays: DiaryDay[] = [];
   private monthCounts = new Map<string, number>();
@@ -46,7 +46,7 @@ export class TimelineView extends ItemView {
   private readonly scheduleReload: () => void;
   private readonly scheduleSearch: () => void;
 
-  constructor(leaf: WorkspaceLeaf, plugin: LifeTimelinePlugin) {
+  constructor(leaf: WorkspaceLeaf, plugin: DayTimelinePlugin) {
     super(leaf);
     this.plugin = plugin;
     const now = new Date();
@@ -237,7 +237,7 @@ export class TimelineView extends ItemView {
     try {
       this.entries = await collectEntries(this.app, this.plugin.settings);
     } catch (error) {
-      console.error("[Life Timeline] 读取日记失败", error);
+      console.error("[Day Timeline] 读取日记失败", error);
       this.entries = [];
     }
     this.loading = false;

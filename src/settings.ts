@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import type LifeTimelinePlugin from "./main";
+import type DayTimelinePlugin from "./main";
 import { el, empty, resolveDailyNotesOptions } from "./utils";
 
 export interface TimelineSettings {
@@ -44,9 +44,9 @@ export const DEFAULT_SETTINGS: TimelineSettings = {
 };
 
 export class TimelineSettingTab extends PluginSettingTab {
-  plugin: LifeTimelinePlugin;
+  plugin: DayTimelinePlugin;
 
-  constructor(app: App, plugin: LifeTimelinePlugin) {
+  constructor(app: App, plugin: DayTimelinePlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }
