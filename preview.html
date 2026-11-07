@@ -1,0 +1,1461 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日记时间线 · 界面预览</title>
+<style id="lt-styles">
+/* ============================================================
+   日记时间线 Life Timeline
+   只使用 Obsidian 主题变量，自动适配明暗主题 / 桌面 / 移动端
+   ============================================================ */
+
+.lt-root {
+  --lt-accent: var(--interactive-accent, #7c6cf0);
+  --lt-card-bg: var(--background-primary-alt, var(--background-secondary, #fff));
+  --lt-head-bg: var(--background-primary, #fff);
+  --lt-border: var(--background-modifier-border, rgba(127, 127, 127, 0.22));
+  --lt-hover: var(--background-modifier-hover, rgba(127, 127, 127, 0.1));
+  --lt-text: var(--text-normal, #222);
+  --lt-muted: var(--text-muted, #777);
+  --lt-faint: var(--text-faint, #999);
+  --lt-radius: 14px;
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  padding: 0 !important;
+  overflow: hidden;
+  color: var(--lt-text);
+  font-family: var(--font-text, inherit);
+  font-size: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lt-root *,
+.lt-root *::before,
+.lt-root *::after {
+  box-sizing: border-box;
+}
+
+.lt-root .is-hidden {
+  display: none !important;
+}
+
+/* ------------------------------------------------------------ 顶栏 */
+
+.lt-header {
+  flex: 0 0 auto;
+  padding: 14px 20px 10px;
+  border-bottom: 1px solid var(--lt-border);
+  background: var(--lt-head-bg);
+}
+
+.lt-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lt-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.lt-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--lt-accent);
+  color: #fff;
+}
+
+.lt-logo svg {
+  width: 19px;
+  height: 19px;
+}
+
+.lt-titles {
+  min-width: 0;
+}
+
+.lt-title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+.lt-stats {
+  font-size: 11px;
+  color: var(--lt-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lt-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 1 auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.lt-actions::-webkit-scrollbar {
+  display: none;
+}
+
+.lt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--lt-muted);
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.lt-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.lt-btn:hover {
+  background: var(--lt-hover);
+  color: var(--lt-text);
+}
+
+.lt-btn.is-active {
+  background: rgba(124, 108, 240, 0.14);
+  background: color-mix(in srgb, var(--lt-accent) 16%, transparent);
+  color: var(--lt-accent);
+}
+
+.lt-link-btn {
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--lt-accent);
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.lt-link-btn:hover {
+  text-decoration: underline;
+}
+
+/* 部分主题会用 button / .view-content button 规则覆盖按钮外观；
+   这里提高特异性并锁定关键属性，避免退化成默认边框按钮 */
+.lt-root button.lt-link-btn {
+  box-shadow: none !important;
+}
+
+.lt-root .lt-card-actions button.lt-link-btn {
+  padding: 6px 12px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 8px;
+  background: rgba(124, 108, 240, 0.08) !important;
+  color: var(--lt-accent) !important;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.lt-root .lt-card-actions button.lt-link-btn:hover {
+  background: rgba(124, 108, 240, 0.18) !important;
+  text-decoration: none;
+}
+
+.lt-btn.lt-sort-btn {
+  width: auto;
+  min-width: 42px;
+  padding: 0 8px;
+  color: var(--lt-muted);
+  font-size: 12px;
+}
+
+.lt-btn.lt-sort-btn:hover {
+  text-decoration: none;
+}
+
+.lt-searchbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.lt-search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 7px 12px;
+  border: 1px solid var(--lt-border);
+  border-radius: 9px;
+  background: var(--lt-card-bg);
+  color: var(--lt-text);
+  font-size: 13px;
+  outline: none;
+}
+
+.lt-search-input:focus {
+  border-color: var(--lt-accent);
+}
+
+.lt-filterbar {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.lt-filterbar::-webkit-scrollbar {
+  display: none;
+}
+
+.lt-chip {
+  flex: 0 0 auto;
+  padding: 4px 11px;
+  border: 1px solid var(--lt-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--lt-muted);
+  font-size: 11px;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.lt-chip:hover {
+  border-color: var(--lt-accent);
+  color: var(--lt-accent);
+}
+
+.lt-chip.is-active {
+  border-color: var(--lt-accent);
+  background: var(--lt-accent);
+  color: #fff;
+}
+
+.lt-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  background: var(--lt-hover);
+  font-size: 11px;
+  color: var(--lt-muted);
+}
+
+.lt-banner .lt-link-btn {
+  flex: 0 0 auto;
+}
+
+/* ------------------------------------------------------------ 滚动区 */
+
+.lt-scroll {
+  flex: 1 1 auto;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 20px 96px;
+  overscroll-behavior: contain;
+}
+
+.lt-content {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.lt-month {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 26px 0 14px 94px;
+}
+
+.lt-month:first-child {
+  margin-top: 4px;
+}
+
+.lt-month-year {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--lt-faint);
+}
+
+.lt-month-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.lt-month-count {
+  font-size: 11px;
+  color: var(--lt-faint);
+}
+
+.lt-month::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--lt-border);
+}
+
+/* ------------------------------------------------------------ 一天 */
+
+.lt-day {
+  display: grid;
+  grid-template-columns: 70px 24px minmax(0, 1fr);
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.lt-rail {
+  padding: 14px 12px 0 0;
+  text-align: right;
+}
+
+.lt-rail-year,
+.lt-rail-month,
+.lt-rail-week {
+  font-size: 10px;
+  color: var(--lt-faint);
+  line-height: 1.4;
+}
+
+.lt-rail-day {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.lt-axis {
+  position: relative;
+}
+
+.lt-axis::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: -16px;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--lt-border);
+}
+
+.lt-day:last-of-type .lt-axis::before {
+  bottom: 50%;
+}
+
+.lt-dot {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  z-index: 1;
+  width: 11px;
+  height: 11px;
+  transform: translateX(-50%);
+  border: 2px solid var(--lt-accent);
+  border-radius: 50%;
+  background: var(--lt-head-bg);
+}
+
+.lt-day.is-today .lt-dot {
+  background: var(--lt-accent);
+  box-shadow: 0 0 0 5px rgba(124, 108, 240, 0.16);
+}
+
+.lt-day.is-today .lt-rail-day,
+.lt-day.is-highlight .lt-rail-day {
+  color: var(--lt-accent);
+}
+
+.lt-day.is-highlight .lt-card {
+  box-shadow: 0 0 0 3px rgba(124, 108, 240, 0.35);
+}
+
+.lt-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--lt-border);
+  border-radius: var(--lt-radius);
+  background: var(--lt-card-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.15s ease;
+}
+
+.lt-card:hover {
+  border-color: var(--lt-accent);
+}
+
+.lt-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--lt-border);
+  cursor: pointer;
+}
+
+.lt-card-heading {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lt-card-date {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.lt-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--lt-hover);
+  color: var(--lt-muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.lt-day.is-today .lt-badge:first-of-type,
+.lt-badge.is-year {
+  background: rgba(124, 108, 240, 0.13);
+  color: var(--lt-accent);
+}
+
+.lt-card-meta {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--lt-faint);
+}
+
+.lt-card-body {
+  padding: 10px 12px 4px;
+}
+
+.lt-entry {
+  padding: 7px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.lt-entry:hover {
+  background: var(--lt-hover);
+}
+
+.lt-entry:focus-visible {
+  outline: 2px solid var(--lt-accent);
+}
+
+.lt-entry-title {
+  margin-bottom: 3px;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lt-entry-excerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  color: var(--lt-muted);
+  font-size: 13px;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.lt-entry-excerpt.is-empty {
+  color: var(--lt-faint);
+  font-style: italic;
+}
+
+.lt-expand {
+  margin: 2px 0 6px 10px;
+}
+
+.lt-images {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 8px 16px 12px;
+}
+
+.lt-images.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lt-image,
+.lt-image-more {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background: var(--lt-hover);
+}
+
+.lt-images.is-single .lt-image {
+  aspect-ratio: 16 / 9;
+}
+
+.lt-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.lt-image-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lt-muted);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lt-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 16px 10px;
+}
+
+.lt-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(124, 108, 240, 0.1);
+  color: var(--lt-accent);
+  font-size: 11px;
+}
+
+.lt-card-actions {
+  display: flex;
+  gap: 18px;
+  padding: 9px 16px;
+  border-top: 1px solid var(--lt-border);
+}
+
+/* ------------------------------------------------------------ 底部 / 空态 / 浮标 */
+
+.lt-list-footer {
+  padding: 18px 0 8px 94px;
+  text-align: center;
+}
+
+.lt-more-btn {
+  padding: 8px 20px;
+  border: 1px solid var(--lt-border);
+  border-radius: 999px;
+  background: var(--lt-card-bg);
+  color: var(--lt-text);
+  font-size: 12px;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.lt-more-btn:hover {
+  border-color: var(--lt-accent);
+  color: var(--lt-accent);
+}
+
+.lt-footer-hint {
+  margin-top: 10px;
+  color: var(--lt-faint);
+  font-size: 11px;
+}
+
+.lt-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 72px 20px;
+  text-align: center;
+}
+
+.lt-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: var(--lt-hover);
+  color: var(--lt-accent);
+}
+
+.lt-empty-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.lt-empty-title {
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.lt-empty-desc {
+  max-width: 380px;
+  color: var(--lt-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.lt-primary-btn {
+  margin-top: 8px;
+  padding: 8px 18px !important;
+  border-radius: 999px;
+  background: var(--lt-accent) !important;
+  color: #fff !important;
+}
+
+.lt-fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 26px;
+  bottom: 26px;
+  z-index: 5;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: var(--lt-accent);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.lt-fab:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.lt-fab svg {
+  width: 22px;
+  height: 22px;
+}
+
+.lt-toast {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  z-index: 10;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--text-normal, #222);
+  color: var(--background-primary, #fff);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------ 日历 */
+
+.lt-calendar {
+  max-width: 760px;
+  margin: 4px auto 0;
+}
+
+.lt-cal-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.lt-cal-title {
+  flex: 1 1 auto;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.lt-cal-today {
+  flex: 0 0 auto;
+  padding: 6px 10px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 8px;
+  color: var(--lt-muted) !important;
+}
+
+.lt-cal-week,
+.lt-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.lt-cal-weekday {
+  padding: 4px 0;
+  color: var(--lt-faint);
+  font-size: 11px;
+  text-align: center;
+}
+
+.lt-cal-grid {
+  margin-top: 4px;
+}
+
+.lt-cal-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  padding: 6px;
+  border: 1px solid var(--lt-border);
+  border-radius: 10px;
+  background: var(--lt-card-bg);
+  cursor: pointer;
+}
+
+.lt-cal-cell:hover {
+  border-color: var(--lt-accent);
+}
+
+.lt-cal-cell.is-outside {
+  opacity: 0.35;
+}
+
+.lt-cal-cell.is-today {
+  border-color: var(--lt-accent);
+  box-shadow: inset 0 0 0 1px var(--lt-accent);
+}
+
+.lt-cal-cell.has-note {
+  background: rgba(124, 108, 240, 0.07);
+}
+
+.lt-cal-num {
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lt-cal-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.25;
+}
+
+.lt-cal-dots {
+  display: flex;
+  z-index: 1;
+  gap: 3px;
+}
+
+.lt-cal-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--lt-accent);
+}
+
+.lt-cal-legend {
+  margin-top: 14px;
+  color: var(--lt-faint);
+  font-size: 11px;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------ 设置面板 */
+
+.lt-setting-intro {
+  padding: 4px 0 14px;
+}
+
+.lt-setting-intro-title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.lt-setting-intro-desc {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.lt-setting-heading {
+  margin: 22px 0 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lt-setting-tip {
+  margin-top: 18px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ------------------------------------------------------------ 手机 / 窄屏 */
+
+@media (max-width: 700px) {
+  .lt-header {
+    padding: 10px 12px 8px;
+  }
+
+  .lt-logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+
+  .lt-title {
+    font-size: 15px;
+  }
+
+  .lt-actions {
+    gap: 1px;
+  }
+
+  .lt-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .lt-scroll {
+    padding: 12px 10px 110px;
+  }
+
+  .lt-day {
+    grid-template-columns: 44px 16px minmax(0, 1fr);
+    margin-bottom: 14px;
+  }
+
+  .lt-rail {
+    padding: 12px 7px 0 0;
+  }
+
+  .lt-rail-day {
+    font-size: 18px;
+  }
+
+  .lt-rail-year,
+  .lt-rail-month,
+  .lt-rail-week {
+    font-size: 9px;
+  }
+
+  .lt-month {
+    margin: 22px 0 12px 60px;
+  }
+
+  .lt-month-name {
+    font-size: 17px;
+  }
+
+  .lt-list-footer {
+    padding-left: 60px;
+  }
+
+  .lt-card-head {
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 10px 12px;
+  }
+
+  .lt-card-date {
+    font-size: 12px;
+  }
+
+  .lt-card-meta {
+    font-size: 10px;
+  }
+
+  .lt-card-body {
+    padding: 8px 8px 2px;
+  }
+
+  .lt-entry {
+    padding: 8px;
+  }
+
+  .lt-entry-excerpt {
+    font-size: 12.5px;
+    line-height: 1.65;
+  }
+
+  .lt-images {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 6px 12px 10px;
+  }
+
+  .lt-tags {
+    padding: 0 12px 8px;
+  }
+
+  .lt-card-actions {
+    gap: 16px;
+    padding: 8px 12px;
+  }
+
+  .lt-fab {
+    right: 16px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+    width: 54px;
+    height: 54px;
+  }
+
+  .lt-fab svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .lt-cal-cell {
+    padding: 4px;
+    border-radius: 8px;
+  }
+
+  .lt-cal-num {
+    font-size: 11px;
+  }
+}
+
+/* Obsidian 移动端会给 body 加上 is-mobile；平板宽度较大时同样收紧 */
+.is-mobile .lt-fab {
+  width: 54px;
+  height: 54px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+}
+
+.is-mobile .lt-btn {
+  width: 36px;
+  height: 36px;
+}
+
+/* ------------------------------------------------------------ 按钮样式兜底
+   Obsidian 核心与部分第三方主题使用 `.view-content button`、`button:not(...)`
+   这类更高特异性的规则，会把单类选择器的按钮打回默认方块按钮。
+   这里统一提高特异性并锁定关键属性，放在文件末尾保证优先级。
+   注意：不写 width / height，避免破坏上方的手机端尺寸。 */
+.lt-root button.lt-btn,
+.lt-root button.lt-btn:hover,
+.lt-root button.lt-btn:focus {
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--lt-muted) !important;
+  box-shadow: none !important;
+  font-family: inherit;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.lt-root button.lt-btn:hover {
+  background: var(--lt-hover) !important;
+  color: var(--lt-text) !important;
+}
+.lt-root button.lt-btn.is-active {
+  background: rgba(124, 108, 240, 0.16) !important;
+  color: var(--lt-accent) !important;
+}
+.lt-root button.lt-btn.lt-sort-btn {
+  padding: 0 8px !important;
+  font-size: 12px;
+}
+.lt-root button.lt-link-btn {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--lt-accent) !important;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.lt-root button.lt-link-btn:hover {
+  background: transparent !important;
+  text-decoration: underline;
+}
+.lt-root button.lt-link-btn.lt-cal-today {
+  padding: 6px 10px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 8px;
+  color: var(--lt-muted) !important;
+}
+.lt-root button.lt-link-btn.lt-cal-today:hover {
+  background: var(--lt-hover) !important;
+  text-decoration: none;
+}
+.lt-root button.lt-link-btn.lt-primary-btn {
+  margin-top: 8px;
+  padding: 8px 18px !important;
+  border: none !important;
+  border-radius: 999px;
+  background: var(--lt-accent) !important;
+  color: #fff !important;
+}
+.lt-root button.lt-link-btn.lt-primary-btn:hover {
+  background: var(--lt-accent) !important;
+  text-decoration: none;
+}
+.lt-root button.lt-chip {
+  padding: 4px 11px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 999px;
+  background: transparent !important;
+  color: var(--lt-muted) !important;
+  box-shadow: none !important;
+  font-size: 11px;
+  font-weight: 400;
+}
+.lt-root button.lt-chip:hover {
+  border-color: var(--lt-accent) !important;
+  background: transparent !important;
+  color: var(--lt-accent) !important;
+}
+.lt-root button.lt-chip.is-active {
+  border-color: var(--lt-accent) !important;
+  background: var(--lt-accent) !important;
+  color: #fff !important;
+}
+.lt-root button.lt-more-btn {
+  padding: 8px 20px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 999px;
+  background: var(--lt-card-bg) !important;
+  color: var(--lt-text) !important;
+  box-shadow: none !important;
+  font-size: 12px;
+}
+.lt-root button.lt-more-btn:hover {
+  border-color: var(--lt-accent) !important;
+  color: var(--lt-accent) !important;
+}
+.lt-root button.lt-fab {
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 50%;
+  background: var(--lt-accent) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22) !important;
+}
+.lt-root input.lt-search-input {
+  padding: 7px 12px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 9px;
+  background: var(--lt-card-bg) !important;
+  color: var(--lt-text) !important;
+  box-shadow: none !important;
+  font-family: inherit;
+  font-size: 13px;
+}
+.lt-root input.lt-search-input:focus {
+  border-color: var(--lt-accent) !important;
+  box-shadow: none !important;
+}
+</style>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #e9ebf1;
+    color: #24242e;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  }
+  .demo-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 12px 22px;
+    background: #fff;
+    border-bottom: 1px solid #dfe1e9;
+  }
+  .demo-brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .demo-brand strong { font-size: 15px; }
+  .demo-brand span { font-size: 12px; color: #8a8c99; }
+  .demo-controls { display: flex; gap: 6px; }
+  .demo-controls button {
+    padding: 6px 14px;
+    border: 1px solid #d8dae4;
+    border-radius: 8px;
+    background: #fff;
+    color: #55576a;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .demo-controls button.is-on { border-color: #6f63e8; background: #6f63e8; color: #fff; }
+  .demo-stage {
+    --interactive-accent: #6f63e8;
+    --background-primary: #ffffff;
+    --background-primary-alt: #ffffff;
+    --background-secondary: #f7f7fa;
+    --background-modifier-border: rgba(30, 30, 60, 0.11);
+    --background-modifier-hover: rgba(30, 30, 60, 0.055);
+    --text-normal: #262631;
+    --text-muted: #6f7180;
+    --text-faint: #a4a6b3;
+    position: relative;
+    width: min(1080px, calc(100% - 32px));
+    height: min(800px, calc(100vh - 96px));
+    min-height: 480px;
+    margin: 16px auto 24px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--background-primary);
+    box-shadow: 0 14px 44px rgba(30, 30, 60, 0.16);
+  }
+  .demo-stage.theme-dark {
+    --interactive-accent: #a89bff;
+    --background-primary: #1e1e26;
+    --background-primary-alt: #25252f;
+    --background-secondary: #1a1a21;
+    --background-modifier-border: rgba(255, 255, 255, 0.1);
+    --background-modifier-hover: rgba(255, 255, 255, 0.07);
+    --text-normal: #e8e8f0;
+    --text-muted: #a2a2b4;
+    --text-faint: #77778e;
+  }
+  body:has(.theme-dark) { background: #16161c; }
+  .demo-stage.is-phone {
+    width: 390px;
+    height: min(780px, calc(100vh - 96px));
+    border: 9px solid #23242c;
+    border-radius: 34px;
+  }
+  /* 手机视图：模拟 Obsidian 移动端窄屏断点与 is-mobile 规则 */
+  .demo-stage.is-phone .lt-header { padding: 10px 12px 8px; }
+  .demo-stage.is-phone .lt-title { font-size: 15px; }
+  .demo-stage.is-phone .lt-btn { width: 36px; height: 36px; }
+  .demo-stage.is-phone .lt-scroll { padding: 12px 10px 110px; }
+  .demo-stage.is-phone .lt-day { grid-template-columns: 44px 16px minmax(0, 1fr); margin-bottom: 14px; }
+  .demo-stage.is-phone .lt-rail { padding: 12px 7px 0 0; }
+  .demo-stage.is-phone .lt-rail-day { font-size: 18px; }
+  .demo-stage.is-phone .lt-rail-year,
+  .demo-stage.is-phone .lt-rail-month,
+  .demo-stage.is-phone .lt-rail-week { font-size: 9px; }
+  .demo-stage.is-phone .lt-month { margin: 22px 0 12px 60px; }
+  .demo-stage.is-phone .lt-month-name { font-size: 17px; }
+  .demo-stage.is-phone .lt-list-footer { padding-left: 60px; }
+  .demo-stage.is-phone .lt-card-head { flex-wrap: wrap; gap: 4px; padding: 10px 12px; }
+  .demo-stage.is-phone .lt-card-date { font-size: 12px; }
+  .demo-stage.is-phone .lt-card-body { padding: 8px 8px 2px; }
+  .demo-stage.is-phone .lt-images { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px 12px 10px; }
+  .demo-stage.is-phone .lt-card-actions { padding: 8px 12px; }
+  .demo-stage.is-phone .lt-fab { width: 54px; height: 54px; right: 16px; bottom: 22px; }
+  .demo-note { text-align: center; font-size: 11px; color: #8a8c99; padding: 0 16px 20px; }
+  body:has(.theme-dark) .demo-note { color: #77778e; }
+</style>
+</head>
+<body>
+
+<div class="demo-toolbar">
+  <div class="demo-brand">
+    <strong>日记时间线 · Life Timeline</strong>
+    <span>静态界面预览 · 示例数据 · 与插件共用同一份 styles.css</span>
+  </div>
+  <div class="demo-controls">
+    <button data-device="desktop" class="is-on">桌面视图</button>
+    <button data-device="phone">手机视图</button>
+    <button id="theme-toggle">切换深色</button>
+  </div>
+</div>
+
+<div class="demo-stage" id="stage">
+  <div class="lt-root" id="root"></div>
+</div>
+<div class="demo-note">点击顶栏按钮可体验日历、那年今天、搜索与排序；移动端按钮会模拟 Obsidian 手机端布局。</div>
+
+<script>
+const ICONS = {
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>',
+  history: '<path d="M3.5 11a8.5 8.5 0 1 1 2.2 6.2"/><path d="M3 4v5h5"/><path d="M12 7.5V12l3 2"/>',
+  refresh: '<path d="M20 11a8 8 0 1 0-2.4 6"/><path d="M20 4v7h-7"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',
+  shuffle: '<path d="M2 18h1.5c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  left: '<path d="m15 18-6-6 6-6"/>',
+  right: '<path d="m9 18 6-6-6-6"/>',
+  book: '<path d="M4 4h7a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4z"/><path d="M20 4h-3a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h3z"/>'
+};
+const icon = (name) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function photo(a, b, label) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>
+    <rect width="480" height="480" fill="url(#g)"/>
+    <circle cx="355" cy="120" r="66" fill="rgba(255,255,255,.42)"/>
+    <path d="M0 350 L140 225 L250 320 L360 240 L480 340 L480 480 L0 480Z" fill="rgba(10,10,30,.18)"/>
+    <path d="M0 410 L180 300 L300 392 L420 320 L480 372 L480 480 L0 480Z" fill="rgba(10,10,30,.13)"/>
+    <text x="22" y="452" font-size="20" font-family="sans-serif" fill="rgba(255,255,255,.9)">${label}</text></svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+const P = [
+  photo("#f5a06a", "#d8546e", "江边晚霞"),
+  photo("#6db4d8", "#3f6fa8", "清晨的江面"),
+  photo("#c7a0e8", "#7059b5", "路过花店"),
+  photo("#8ecf9a", "#3f8a72", "公园长椅"),
+  photo("#f0c46a", "#c9773f", "一杯热拿铁"),
+  photo("#8fa4dc", "#4a4f86", "雨后的街"),
+  photo("#e79ab0", "#a7527a", "旧书店"),
+  photo("#79c6bd", "#347e88", "海边")
+];
+
+const DATA = [
+  { date: "2026-11-07", charCount: 486, tags: ["生活", "摄影", "散步"], images: [P[0], P[1], P[2], P[3], P[4]],
+    entries: [{ title: "2026-11-07", excerpt: "周六。早起去江边走了走，风很大但阳光很好。回来路上顺手拍了几张照片，买了 baker 家刚出炉的可颂。下午把书桌上堆了一周的杂物理干净，突然觉得日子是可以慢慢整理的。" }] },
+  { date: "2026-11-06", charCount: 712, tags: ["工作", "随记"], images: [P[5], P[6]],
+    entries: [
+      { title: "2026-11-06", excerpt: "下了一整天的雨。项目终于收尾，晚上和同事吃了顿火锅，聊了很多不着边际的事。" },
+      { title: "读书笔记 · 当下的力量", excerpt: "「你拥有的只有此刻。」把这句话抄在了本子第一页，提醒自己别总在赶路。" }
+    ] },
+  { date: "2026-11-04", charCount: 264, tags: ["随手记"], images: [],
+    entries: [{ title: "2026-11-04", excerpt: "没什么特别的事。楼下那棵银杏开始黄了，每天路过都忍不住看一眼。" }] },
+  { date: "2026-11-01", charCount: 538, tags: ["月初", "计划"], images: [P[7]],
+    entries: [{ title: "2026-11-01", excerpt: "十一月了。给自己列了三件小事：把相册整理完、每周至少走两次江边、把拖了很久的那封信写完。" }] },
+  { date: "2026-10-28", charCount: 320, tags: ["旅行"], images: [P[7], P[1]],
+    entries: [{ title: "2026-10-28", excerpt: "去了一趟海边，风把帽子吹进了浪里，索性光着头走了两公里。" }] },
+  { date: "2026-10-19", charCount: 198, tags: ["生活"], images: [],
+    entries: [{ title: "2026-10-19", excerpt: "换了新的床单，晒过太阳的味道。晚上很早就睡了。" }] },
+  { date: "2025-11-07", charCount: 412, tags: ["那年今日"], images: [P[3]],
+    entries: [{ title: "2025-11-07", excerpt: "去年的今天也在江边，只是那时候还在为换工作焦虑。一年过去，事情好像自己慢慢长出了答案。" }] },
+  { date: "2024-11-07", charCount: 176, tags: ["那年今日"], images: [],
+    entries: [{ title: "2024-11-07", excerpt: "立冬。第一次尝试写日记，不知道能坚持多久。" }] }
+];
+
+const WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+const WEEKL = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+const MONTH = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
+const TODAY = "2026-11-07";
+const parse = (key) => { const [y, m, d] = key.split("-").map(Number); return new Date(y, m - 1, d); };
+
+const state = { mode: "timeline", order: "desc", query: "", year: "", month: new Date(2026, 10, 1), searchOpen: false };
+const root = document.getElementById("root");
+const stage = document.getElementById("stage");
+
+function filtered() {
+  let rows = DATA.slice();
+  if (state.mode === "memory") {
+    rows = rows.filter((r) => r.date.slice(5) === TODAY.slice(5) && r.date.slice(0, 4) !== "2026");
+  }
+  if (state.year) rows = rows.filter((r) => r.date.startsWith(state.year));
+  if (state.query) {
+    const q = state.query.toLowerCase();
+    rows = rows.filter((r) => (r.entries.map((e) => e.title + e.excerpt).join(" ") + r.tags.join(" ")).toLowerCase().includes(q));
+  }
+  rows.sort((a, b) => state.order === "desc" ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date));
+  return rows;
+}
+
+function headerHTML() {
+  const years = [...new Set(DATA.map((r) => r.date.slice(0, 4)))].sort().reverse();
+  const chips = years.map((y) => `<button class="lt-chip${state.year === y ? " is-active" : ""}" data-year="${y}">${y} 年</button>`).join("");
+  const banner = (state.mode === "memory" || state.query || state.year)
+    ? `<div class="lt-banner"><span class="lt-banner-text">${state.mode === "memory" ? "那年今天 · 11月7日 · " : ""}${state.query ? `搜索「${esc(state.query)}」 · ` : ""}${state.year ? `${state.year} 年 · ` : ""}共 ${filtered().length} 天</span><button class="lt-link-btn" data-act="reset">返回完整时间线</button></div>`
+    : '<div class="lt-banner is-hidden"></div>';
+  return `<header class="lt-header">
+    <div class="lt-titlebar">
+      <div class="lt-brand"><span class="lt-logo">${icon("calendar")}</span>
+        <div class="lt-titles"><div class="lt-title">时光轴</div>
+        <div class="lt-stats">${DATA.length} 天 · ${DATA.reduce((n, r) => n + r.entries.length, 0)} 篇日记</div></div>
+      </div>
+      <div class="lt-actions">
+        <button class="lt-btn" data-act="search" title="搜索日记">${icon("search")}</button>
+        <button class="lt-btn${state.mode === "calendar" ? " is-active" : ""}" data-act="calendar" title="日历视图">${icon("calendar")}</button>
+        <button class="lt-btn${state.mode === "memory" ? " is-active" : ""}" data-act="memory" title="那年今天">${icon("history")}</button>
+        <button class="lt-btn" data-act="random" title="随机打开一篇日记">${icon("shuffle")}</button>
+        <button class="lt-btn lt-sort-btn" data-act="sort" title="切换排序">${state.order === "desc" ? "倒序" : "正序"}</button>
+        <button class="lt-btn" data-act="refresh" title="重新读取日记">${icon("refresh")}</button>
+        <button class="lt-btn" data-act="settings" title="插件设置">${icon("settings")}</button>
+      </div>
+    </div>
+    <div class="lt-searchbar${state.searchOpen ? "" : " is-hidden"}">
+      <input class="lt-search-input" type="search" placeholder="搜索标题、正文、标签…" value="${esc(state.query)}">
+      <button class="lt-btn lt-search-clear" data-act="clear" title="清除搜索">${icon("x")}</button>
+    </div>
+    <div class="lt-filterbar${state.mode === "calendar" ? " is-hidden" : ""}">
+      <button class="lt-chip${state.year === "" ? " is-active" : ""}" data-year="">全部</button>${chips}
+    </div>
+    ${banner}
+  </header>`;
+}
+
+function dayHTML(row, monthKey, showMonth) {
+  const d = parse(row.date);
+  const mk = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  const month = showMonth ? `<div class="lt-month"><span class="lt-month-year">${d.getFullYear()}</span><span class="lt-month-name">${d.getMonth() + 1} 月</span><span class="lt-month-count">${filtered().filter((r) => r.date.slice(0, 7) === mk).length} 天</span></div>` : "";
+  const label = row.date === TODAY ? "今天" : WEEK[d.getDay()];
+  const images = row.images.length
+    ? `<div class="lt-images${row.images.length === 1 ? " is-single" : ""}">${row.images.slice(0, 4).map((src) => `<div class="lt-image"><img src="${src}" alt="日记图片" loading="lazy"></div>`).join("")}${row.images.length > 4 ? `<div class="lt-image-more">+${row.images.length - 4}</div>` : ""}</div>`
+    : "";
+  const tags = row.tags.length ? `<div class="lt-tags">${row.tags.map((t) => `<span class="lt-tag">#${esc(t)}</span>`).join("")}</div>` : "";
+  const entries = row.entries.map((e) => `<div class="lt-entry"><div class="lt-entry-title">${esc(e.title)}</div><div class="lt-entry-excerpt">${esc(e.excerpt)}</div></div>`).join("");
+  return `${month}<section class="lt-day${row.date === TODAY ? " is-today" : ""}" data-date="${row.date}">
+    <div class="lt-rail">${state.mode === "memory" ? `<div class="lt-rail-year">${d.getFullYear()}</div>` : ""}
+      <div class="lt-rail-month">${d.getMonth() + 1}月</div>
+      <div class="lt-rail-day">${String(d.getDate()).padStart(2, "0")}</div>
+      <div class="lt-rail-week">${WEEK[d.getDay()]}</div></div>
+    <div class="lt-axis"><span class="lt-dot"></span></div>
+    <div class="lt-card">
+      <div class="lt-card-head"><div class="lt-card-heading">
+        <span class="lt-card-date">${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 · ${WEEKL[d.getDay()]}</span>
+        <span class="lt-badge">${label}</span>${state.mode === "memory" ? `<span class="lt-badge is-year">${d.getFullYear()} 年</span>` : ""}
+      </div><div class="lt-card-meta">${row.entries.length} 篇 · ${row.charCount} 字</div></div>
+      <div class="lt-card-body">${entries}</div>
+      ${images}${tags}
+      <div class="lt-card-actions"><button class="lt-link-btn" data-act="open">打开日记</button></div>
+    </div></section>`;
+}
+
+function timelineHTML() {
+  const rows = filtered();
+  if (!rows.length) return `<div class="lt-empty"><div class="lt-empty-icon">${icon("book")}</div>
+    <div class="lt-empty-title">没有找到匹配的日记</div>
+    <div class="lt-empty-desc">换个关键词，或在插件设置里检查日记文件夹与日期格式。</div>
+    <button class="lt-link-btn lt-primary-btn" data-act="new">写一篇今天的日记</button></div>`;
+  let last = "";
+  return rows.map((row) => {
+    const d = parse(row.date);
+    const mk = `${d.getFullYear()}-${d.getMonth() + 1}`;
+    const show = mk !== last;
+    last = mk;
+    return dayHTML(row, mk, show);
+  }).join("") + `<div class="lt-list-footer"><div class="lt-footer-hint">· 已经到底了 · 共 ${rows.length} 天</div></div>`;
+}
+
+function calendarHTML() {
+  const y = state.month.getFullYear(), m = state.month.getMonth();
+  const map = new Map(DATA.map((r) => [r.date, r]));
+  const offset = (new Date(y, m, 1).getDay() + 6) % 7;
+  const count = Math.ceil((offset + new Date(y, m + 1, 0).getDate()) / 7) * 7;
+  let cells = "";
+  for (let i = 0; i < count; i++) {
+    const d = new Date(y, m, i - offset + 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const row = map.get(key);
+    cells += `<div class="lt-cal-cell${d.getMonth() !== m ? " is-outside" : ""}${row ? " has-note" : ""}${key === TODAY ? " is-today" : ""}" data-date="${key}" title="${key}${row ? " · 有日记" : " · 点击新建日记"}">
+      ${row && row.images[0] ? `<img class="lt-cal-thumb" src="${row.images[0]}" alt="">` : ""}
+      <div class="lt-cal-num">${d.getDate()}</div>
+      <div class="lt-cal-dots">${row ? row.entries.slice(0, 3).map(() => '<span class="lt-cal-dot"></span>').join("") : ""}</div></div>`;
+  }
+  return `<div class="lt-calendar">
+    <div class="lt-cal-bar">
+      <button class="lt-btn" data-act="prev" title="上一个月">${icon("left")}</button>
+      <div class="lt-cal-title">${y} 年 ${m + 1} 月</div>
+      <button class="lt-btn" data-act="next" title="下一个月">${icon("right")}</button>
+      <button class="lt-link-btn lt-cal-today" data-act="thisMonth">回到本月</button>
+    </div>
+    <div class="lt-cal-week">${["一", "二", "三", "四", "五", "六", "日"].map((w) => `<div class="lt-cal-weekday">${w}</div>`).join("")}</div>
+    <div class="lt-cal-grid">${cells}</div>
+    <div class="lt-cal-legend">有圆点的日子写过日记 · 点空白日期可以新建这一天的日记</div>
+  </div>`;
+}
+
+function render(scrollTop) {
+  const list = root.querySelector(".lt-scroll");
+  const top = scrollTop ?? (list ? list.scrollTop : 0);
+  root.innerHTML = headerHTML() + `<div class="lt-scroll"><div class="lt-content">${state.mode === "calendar" ? calendarHTML() : timelineHTML()}</div></div>
+    <button class="lt-fab" data-act="new" title="写今天的日记">${icon("plus")}</button>`;
+  root.querySelector(".lt-scroll").scrollTop = top;
+  bind();
+}
+
+function toast(text) {
+  const node = document.createElement("div");
+  node.className = "lt-toast";
+  node.textContent = text;
+  root.appendChild(node);
+  setTimeout(() => node.remove(), 2000);
+}
+
+function bind() {
+  const input = root.querySelector(".lt-search-input");
+  if (input) input.addEventListener("input", () => { state.query = input.value.trim(); render(0); const again = root.querySelector(".lt-search-input"); if (again) { again.focus(); again.setSelectionRange(again.value.length, again.value.length); } });
+  root.querySelectorAll("[data-act]").forEach((btn) => btn.addEventListener("click", (e) => {
+    const act = btn.dataset.act;
+    if (act === "search") { state.searchOpen = !state.searchOpen; render(0); if (state.searchOpen) root.querySelector(".lt-search-input").focus(); }
+    else if (act === "clear") { state.query = ""; render(0); }
+    else if (act === "calendar") { state.mode = state.mode === "calendar" ? "timeline" : "calendar"; render(0); }
+    else if (act === "memory") { state.mode = state.mode === "memory" ? "timeline" : "memory"; state.year = ""; render(0); }
+    else if (act === "sort") { state.order = state.order === "desc" ? "asc" : "desc"; render(0); }
+    else if (act === "random") {
+      const rows = filtered();
+      const picked = rows[Math.floor(Math.random() * rows.length)];
+      toast(picked ? `随机打开：${picked.date} · ${picked.entries[0].title}` : "还没有找到日记");
+    }
+    else if (act === "refresh") { render(); toast("已重新读取 8 天 · 9 篇日记"); }
+    else if (act === "settings") toast("在 Obsidian → 设置 → 日记时间线 中打开");
+    else if (act === "reset") { state.mode = "timeline"; state.query = ""; state.year = ""; state.searchOpen = false; render(0); }
+    else if (act === "new") toast("会按 YYYY-MM-DD 创建并打开今天的日记");
+    else if (act === "open") toast("会在新标签页打开这一天的日记");
+    else if (act === "prev" || act === "next") { state.month = new Date(state.month.getFullYear(), state.month.getMonth() + (act === "next" ? 1 : -1), 1); render(0); }
+    else if (act === "thisMonth") { state.month = new Date(2026, 10, 1); render(0); }
+    e.stopPropagation();
+  }));
+  root.querySelectorAll("[data-year]").forEach((chip) => chip.addEventListener("click", () => { state.year = state.year === chip.dataset.year ? "" : chip.dataset.year; render(0); }));
+  root.querySelectorAll(".lt-entry, .lt-card-head, .lt-image, .lt-image-more").forEach((node) => node.addEventListener("click", () => toast("会在新标签页打开这一天的日记")));
+  root.querySelectorAll(".lt-cal-cell").forEach((cell) => cell.addEventListener("click", () => {
+    const key = cell.dataset.date;
+    if (DATA.some((r) => r.date === key)) { state.mode = "timeline"; state.year = ""; state.query = ""; render(0); toast(`已跳到 ${key}`); }
+    else toast(`新建 ${key} 的日记`);
+  }));
+}
+
+document.querySelectorAll("[data-device]").forEach((btn) => btn.addEventListener("click", () => {
+  document.querySelectorAll("[data-device]").forEach((b) => b.classList.toggle("is-on", b === btn));
+  stage.classList.toggle("is-phone", btn.dataset.device === "phone");
+  render(0);
+}));
+document.getElementById("theme-toggle").addEventListener("click", (e) => {
+  stage.classList.toggle("theme-dark");
+  e.target.textContent = stage.classList.contains("theme-dark") ? "切换浅色" : "切换深色";
+});
+
+render();
+</script>
+</body>
+</html>

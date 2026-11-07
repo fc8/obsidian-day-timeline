@@ -1,0 +1,1086 @@
+/* ============================================================
+   日记时间线 Life Timeline
+   只使用 Obsidian 主题变量，自动适配明暗主题 / 桌面 / 移动端
+   ============================================================ */
+
+.lt-root {
+  --lt-accent: var(--interactive-accent, #7c6cf0);
+  --lt-card-bg: var(--background-primary-alt, var(--background-secondary, #fff));
+  --lt-head-bg: var(--background-primary, #fff);
+  --lt-border: var(--background-modifier-border, rgba(127, 127, 127, 0.22));
+  --lt-hover: var(--background-modifier-hover, rgba(127, 127, 127, 0.1));
+  --lt-text: var(--text-normal, #222);
+  --lt-muted: var(--text-muted, #777);
+  --lt-faint: var(--text-faint, #999);
+  --lt-radius: 14px;
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  padding: 0 !important;
+  overflow: hidden;
+  color: var(--lt-text);
+  font-family: var(--font-text, inherit);
+  font-size: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lt-root *,
+.lt-root *::before,
+.lt-root *::after {
+  box-sizing: border-box;
+}
+
+.lt-root .is-hidden {
+  display: none !important;
+}
+
+/* ------------------------------------------------------------ 顶栏 */
+
+.lt-header {
+  flex: 0 0 auto;
+  padding: 14px 20px 10px;
+  border-bottom: 1px solid var(--lt-border);
+  background: var(--lt-head-bg);
+}
+
+.lt-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lt-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.lt-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--lt-accent);
+  color: #fff;
+}
+
+.lt-logo svg {
+  width: 19px;
+  height: 19px;
+}
+
+.lt-titles {
+  min-width: 0;
+}
+
+.lt-title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+.lt-stats {
+  font-size: 11px;
+  color: var(--lt-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lt-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 1 auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.lt-actions::-webkit-scrollbar {
+  display: none;
+}
+
+.lt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--lt-muted);
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.lt-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.lt-btn:hover {
+  background: var(--lt-hover);
+  color: var(--lt-text);
+}
+
+.lt-btn.is-active {
+  background: rgba(124, 108, 240, 0.14);
+  background: color-mix(in srgb, var(--lt-accent) 16%, transparent);
+  color: var(--lt-accent);
+}
+
+.lt-link-btn {
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--lt-accent);
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.lt-link-btn:hover {
+  text-decoration: underline;
+}
+
+/* 部分主题会用 button / .view-content button 规则覆盖按钮外观；
+   这里提高特异性并锁定关键属性，避免退化成默认边框按钮 */
+.lt-root button.lt-link-btn {
+  box-shadow: none !important;
+}
+
+.lt-root .lt-card-actions button.lt-link-btn {
+  padding: 6px 12px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 8px;
+  background: rgba(124, 108, 240, 0.08) !important;
+  color: var(--lt-accent) !important;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.lt-root .lt-card-actions button.lt-link-btn:hover {
+  background: rgba(124, 108, 240, 0.18) !important;
+  text-decoration: none;
+}
+
+.lt-btn.lt-sort-btn {
+  width: auto;
+  min-width: 42px;
+  padding: 0 8px;
+  color: var(--lt-muted);
+  font-size: 12px;
+}
+
+.lt-btn.lt-sort-btn:hover {
+  text-decoration: none;
+}
+
+.lt-searchbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.lt-search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 7px 12px;
+  border: 1px solid var(--lt-border);
+  border-radius: 9px;
+  background: var(--lt-card-bg);
+  color: var(--lt-text);
+  font-size: 13px;
+  outline: none;
+}
+
+.lt-search-input:focus {
+  border-color: var(--lt-accent);
+}
+
+.lt-filterbar {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.lt-filterbar::-webkit-scrollbar {
+  display: none;
+}
+
+.lt-chip {
+  flex: 0 0 auto;
+  padding: 4px 11px;
+  border: 1px solid var(--lt-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--lt-muted);
+  font-size: 11px;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.lt-chip:hover {
+  border-color: var(--lt-accent);
+  color: var(--lt-accent);
+}
+
+.lt-chip.is-active {
+  border-color: var(--lt-accent);
+  background: var(--lt-accent);
+  color: #fff;
+}
+
+.lt-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  background: var(--lt-hover);
+  font-size: 11px;
+  color: var(--lt-muted);
+}
+
+.lt-banner .lt-link-btn {
+  flex: 0 0 auto;
+}
+
+/* ------------------------------------------------------------ 滚动区 */
+
+.lt-scroll {
+  flex: 1 1 auto;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 20px 96px;
+  overscroll-behavior: contain;
+}
+
+.lt-content {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.lt-month {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 26px 0 14px 94px;
+}
+
+.lt-month:first-child {
+  margin-top: 4px;
+}
+
+.lt-month-year {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--lt-faint);
+}
+
+.lt-month-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.lt-month-count {
+  font-size: 11px;
+  color: var(--lt-faint);
+}
+
+.lt-month::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--lt-border);
+}
+
+/* ------------------------------------------------------------ 一天 */
+
+.lt-day {
+  display: grid;
+  grid-template-columns: 70px 24px minmax(0, 1fr);
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.lt-rail {
+  padding: 14px 12px 0 0;
+  text-align: right;
+}
+
+.lt-rail-year,
+.lt-rail-month,
+.lt-rail-week {
+  font-size: 10px;
+  color: var(--lt-faint);
+  line-height: 1.4;
+}
+
+.lt-rail-day {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.lt-axis {
+  position: relative;
+}
+
+.lt-axis::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: -16px;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--lt-border);
+}
+
+.lt-day:last-of-type .lt-axis::before {
+  bottom: 50%;
+}
+
+.lt-dot {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  z-index: 1;
+  width: 11px;
+  height: 11px;
+  transform: translateX(-50%);
+  border: 2px solid var(--lt-accent);
+  border-radius: 50%;
+  background: var(--lt-head-bg);
+}
+
+.lt-day.is-today .lt-dot {
+  background: var(--lt-accent);
+  box-shadow: 0 0 0 5px rgba(124, 108, 240, 0.16);
+}
+
+.lt-day.is-today .lt-rail-day,
+.lt-day.is-highlight .lt-rail-day {
+  color: var(--lt-accent);
+}
+
+.lt-day.is-highlight .lt-card {
+  box-shadow: 0 0 0 3px rgba(124, 108, 240, 0.35);
+}
+
+.lt-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--lt-border);
+  border-radius: var(--lt-radius);
+  background: var(--lt-card-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.15s ease;
+}
+
+.lt-card:hover {
+  border-color: var(--lt-accent);
+}
+
+.lt-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--lt-border);
+  cursor: pointer;
+}
+
+.lt-card-heading {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lt-card-date {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.lt-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--lt-hover);
+  color: var(--lt-muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.lt-day.is-today .lt-badge:first-of-type,
+.lt-badge.is-year {
+  background: rgba(124, 108, 240, 0.13);
+  color: var(--lt-accent);
+}
+
+.lt-card-meta {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--lt-faint);
+}
+
+.lt-card-body {
+  padding: 10px 12px 4px;
+}
+
+.lt-entry {
+  padding: 7px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.lt-entry:hover {
+  background: var(--lt-hover);
+}
+
+.lt-entry:focus-visible {
+  outline: 2px solid var(--lt-accent);
+}
+
+.lt-entry-title {
+  margin-bottom: 3px;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lt-entry-excerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  color: var(--lt-muted);
+  font-size: 13px;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.lt-entry-excerpt.is-empty {
+  color: var(--lt-faint);
+  font-style: italic;
+}
+
+.lt-expand {
+  margin: 2px 0 6px 10px;
+}
+
+.lt-images {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 8px 16px 12px;
+}
+
+.lt-images.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lt-image,
+.lt-image-more {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background: var(--lt-hover);
+}
+
+.lt-images.is-single .lt-image {
+  aspect-ratio: 16 / 9;
+}
+
+.lt-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.lt-image-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lt-muted);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lt-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 16px 10px;
+}
+
+.lt-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(124, 108, 240, 0.1);
+  color: var(--lt-accent);
+  font-size: 11px;
+}
+
+.lt-card-actions {
+  display: flex;
+  gap: 18px;
+  padding: 9px 16px;
+  border-top: 1px solid var(--lt-border);
+}
+
+/* ------------------------------------------------------------ 底部 / 空态 / 浮标 */
+
+.lt-list-footer {
+  padding: 18px 0 8px 94px;
+  text-align: center;
+}
+
+.lt-more-btn {
+  padding: 8px 20px;
+  border: 1px solid var(--lt-border);
+  border-radius: 999px;
+  background: var(--lt-card-bg);
+  color: var(--lt-text);
+  font-size: 12px;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.lt-more-btn:hover {
+  border-color: var(--lt-accent);
+  color: var(--lt-accent);
+}
+
+.lt-footer-hint {
+  margin-top: 10px;
+  color: var(--lt-faint);
+  font-size: 11px;
+}
+
+.lt-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 72px 20px;
+  text-align: center;
+}
+
+.lt-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: var(--lt-hover);
+  color: var(--lt-accent);
+}
+
+.lt-empty-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.lt-empty-title {
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.lt-empty-desc {
+  max-width: 380px;
+  color: var(--lt-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.lt-primary-btn {
+  margin-top: 8px;
+  padding: 8px 18px !important;
+  border-radius: 999px;
+  background: var(--lt-accent) !important;
+  color: #fff !important;
+}
+
+.lt-fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 26px;
+  bottom: 26px;
+  z-index: 5;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: var(--lt-accent);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.lt-fab:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.lt-fab svg {
+  width: 22px;
+  height: 22px;
+}
+
+.lt-toast {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  z-index: 10;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--text-normal, #222);
+  color: var(--background-primary, #fff);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------ 日历 */
+
+.lt-calendar {
+  max-width: 760px;
+  margin: 4px auto 0;
+}
+
+.lt-cal-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.lt-cal-title {
+  flex: 1 1 auto;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.lt-cal-today {
+  flex: 0 0 auto;
+  padding: 6px 10px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 8px;
+  color: var(--lt-muted) !important;
+}
+
+.lt-cal-week,
+.lt-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.lt-cal-weekday {
+  padding: 4px 0;
+  color: var(--lt-faint);
+  font-size: 11px;
+  text-align: center;
+}
+
+.lt-cal-grid {
+  margin-top: 4px;
+}
+
+.lt-cal-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  padding: 6px;
+  border: 1px solid var(--lt-border);
+  border-radius: 10px;
+  background: var(--lt-card-bg);
+  cursor: pointer;
+}
+
+.lt-cal-cell:hover {
+  border-color: var(--lt-accent);
+}
+
+.lt-cal-cell.is-outside {
+  opacity: 0.35;
+}
+
+.lt-cal-cell.is-today {
+  border-color: var(--lt-accent);
+  box-shadow: inset 0 0 0 1px var(--lt-accent);
+}
+
+.lt-cal-cell.has-note {
+  background: rgba(124, 108, 240, 0.07);
+}
+
+.lt-cal-num {
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lt-cal-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.25;
+}
+
+.lt-cal-dots {
+  display: flex;
+  z-index: 1;
+  gap: 3px;
+}
+
+.lt-cal-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--lt-accent);
+}
+
+.lt-cal-legend {
+  margin-top: 14px;
+  color: var(--lt-faint);
+  font-size: 11px;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------ 设置面板 */
+
+.lt-setting-intro {
+  padding: 4px 0 14px;
+}
+
+.lt-setting-intro-title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.lt-setting-intro-desc {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.lt-setting-heading {
+  margin: 22px 0 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lt-setting-tip {
+  margin-top: 18px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ------------------------------------------------------------ 手机 / 窄屏 */
+
+@media (max-width: 700px) {
+  .lt-header {
+    padding: 10px 12px 8px;
+  }
+
+  .lt-logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+
+  .lt-title {
+    font-size: 15px;
+  }
+
+  .lt-actions {
+    gap: 1px;
+  }
+
+  .lt-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .lt-scroll {
+    padding: 12px 10px 110px;
+  }
+
+  .lt-day {
+    grid-template-columns: 44px 16px minmax(0, 1fr);
+    margin-bottom: 14px;
+  }
+
+  .lt-rail {
+    padding: 12px 7px 0 0;
+  }
+
+  .lt-rail-day {
+    font-size: 18px;
+  }
+
+  .lt-rail-year,
+  .lt-rail-month,
+  .lt-rail-week {
+    font-size: 9px;
+  }
+
+  .lt-month {
+    margin: 22px 0 12px 60px;
+  }
+
+  .lt-month-name {
+    font-size: 17px;
+  }
+
+  .lt-list-footer {
+    padding-left: 60px;
+  }
+
+  .lt-card-head {
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 10px 12px;
+  }
+
+  .lt-card-date {
+    font-size: 12px;
+  }
+
+  .lt-card-meta {
+    font-size: 10px;
+  }
+
+  .lt-card-body {
+    padding: 8px 8px 2px;
+  }
+
+  .lt-entry {
+    padding: 8px;
+  }
+
+  .lt-entry-excerpt {
+    font-size: 12.5px;
+    line-height: 1.65;
+  }
+
+  .lt-images {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 6px 12px 10px;
+  }
+
+  .lt-tags {
+    padding: 0 12px 8px;
+  }
+
+  .lt-card-actions {
+    gap: 16px;
+    padding: 8px 12px;
+  }
+
+  .lt-fab {
+    right: 16px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+    width: 54px;
+    height: 54px;
+  }
+
+  .lt-fab svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .lt-cal-cell {
+    padding: 4px;
+    border-radius: 8px;
+  }
+
+  .lt-cal-num {
+    font-size: 11px;
+  }
+}
+
+/* Obsidian 移动端会给 body 加上 is-mobile；平板宽度较大时同样收紧 */
+.is-mobile .lt-fab {
+  width: 54px;
+  height: 54px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+}
+
+.is-mobile .lt-btn {
+  width: 36px;
+  height: 36px;
+}
+
+/* ------------------------------------------------------------ 按钮样式兜底
+   Obsidian 核心与部分第三方主题使用 `.view-content button`、`button:not(...)`
+   这类更高特异性的规则，会把单类选择器的按钮打回默认方块按钮。
+   这里统一提高特异性并锁定关键属性，放在文件末尾保证优先级。
+   注意：不写 width / height，避免破坏上方的手机端尺寸。 */
+.lt-root button.lt-btn,
+.lt-root button.lt-btn:hover,
+.lt-root button.lt-btn:focus {
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--lt-muted) !important;
+  box-shadow: none !important;
+  font-family: inherit;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.lt-root button.lt-btn:hover {
+  background: var(--lt-hover) !important;
+  color: var(--lt-text) !important;
+}
+.lt-root button.lt-btn.is-active {
+  background: rgba(124, 108, 240, 0.16) !important;
+  color: var(--lt-accent) !important;
+}
+.lt-root button.lt-btn.lt-sort-btn {
+  padding: 0 8px !important;
+  font-size: 12px;
+}
+.lt-root button.lt-link-btn {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--lt-accent) !important;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.lt-root button.lt-link-btn:hover {
+  background: transparent !important;
+  text-decoration: underline;
+}
+.lt-root button.lt-link-btn.lt-cal-today {
+  padding: 6px 10px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 8px;
+  color: var(--lt-muted) !important;
+}
+.lt-root button.lt-link-btn.lt-cal-today:hover {
+  background: var(--lt-hover) !important;
+  text-decoration: none;
+}
+.lt-root button.lt-link-btn.lt-primary-btn {
+  margin-top: 8px;
+  padding: 8px 18px !important;
+  border: none !important;
+  border-radius: 999px;
+  background: var(--lt-accent) !important;
+  color: #fff !important;
+}
+.lt-root button.lt-link-btn.lt-primary-btn:hover {
+  background: var(--lt-accent) !important;
+  text-decoration: none;
+}
+.lt-root button.lt-chip {
+  padding: 4px 11px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 999px;
+  background: transparent !important;
+  color: var(--lt-muted) !important;
+  box-shadow: none !important;
+  font-size: 11px;
+  font-weight: 400;
+}
+.lt-root button.lt-chip:hover {
+  border-color: var(--lt-accent) !important;
+  background: transparent !important;
+  color: var(--lt-accent) !important;
+}
+.lt-root button.lt-chip.is-active {
+  border-color: var(--lt-accent) !important;
+  background: var(--lt-accent) !important;
+  color: #fff !important;
+}
+.lt-root button.lt-more-btn {
+  padding: 8px 20px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 999px;
+  background: var(--lt-card-bg) !important;
+  color: var(--lt-text) !important;
+  box-shadow: none !important;
+  font-size: 12px;
+}
+.lt-root button.lt-more-btn:hover {
+  border-color: var(--lt-accent) !important;
+  color: var(--lt-accent) !important;
+}
+.lt-root button.lt-fab {
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 50%;
+  background: var(--lt-accent) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22) !important;
+}
+.lt-root input.lt-search-input {
+  padding: 7px 12px !important;
+  border: 1px solid var(--lt-border) !important;
+  border-radius: 9px;
+  background: var(--lt-card-bg) !important;
+  color: var(--lt-text) !important;
+  box-shadow: none !important;
+  font-family: inherit;
+  font-size: 13px;
+}
+.lt-root input.lt-search-input:focus {
+  border-color: var(--lt-accent) !important;
+  box-shadow: none !important;
+}
