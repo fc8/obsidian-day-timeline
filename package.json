@@ -1,5 +1,5 @@
 {
-  "name": "obsidian-life-timeline",
+  "name": "obsidian-day-timeline",
   "version": "1.0.0",
   "description": "把 Obsidian 日记按天排成时间线，参考「人生笔记 Real」，同时支持桌面端与移动端。",
   "private": true,
