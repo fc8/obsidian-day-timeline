@@ -634,7 +634,7 @@ export class TimelineView extends ItemView {
         cell.appendChild(dots);
       }
 
-      cell.title = day ? `${key} · ${day.entries.length} 篇日记` : `${key} · 点击新建日记`;
+      cell.title = day ? `${key} · ${day.entries.length} 篇日记` : `${key} · 点击写这一天的日记`;
       cell.addEventListener("click", () => {
         if (day) {
           this.mode = "timeline";
@@ -649,7 +649,7 @@ export class TimelineView extends ItemView {
     }
     calendar.appendChild(grid);
 
-    const legend = el("div", "lt-cal-legend", "有圆点的日子写过日记 · 点空白日期可以新建这一天的日记");
+    const legend = el("div", "lt-cal-legend", "有圆点的日子写过日记 · 点空白日期可以写这一天的日记");
     calendar.appendChild(legend);
     this.listEl.appendChild(calendar);
   }

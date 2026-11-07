@@ -66,6 +66,56 @@ export function diaryPathFor(app: App, settings: TimelineSettings, date: Date): 
   return normalizePath(raw).replace(/^\//, "");
 }
 
+/** 扫描与查找共用的候选文件集合：跟随日记目录，并遵守排除文件夹设置。 */
+function candidateFiles(app: App, settings: TimelineSettings): TFile[] {
+  const source = getDiarySource(app, settings);
+  const excludes = settings.excludeFolders
+    .split(",")
+    .map(cleanFolder)
+    .filter((item) => item.length > 0);
+
+  return app.vault.getMarkdownFiles().filter((file) => {
+    if (source.folder && !file.path.startsWith(`${source.folder}/`)) return false;
+    return !excludes.some((excluded) => file.path === excluded || file.path.startsWith(`${excluded}/`));
+  });
+}
+
+/**
+ * 判断一个文件属于哪一天，规则与时间线索引完全一致：
+ * frontmatter 日期字段 → 文件名日期 → 可选的创建时间。
+ * 只读 metadataCache，不读正文，因此适合点击「写日记」这类高频操作。
+ */
+export function entryDateFor(app: App, settings: TimelineSettings, file: TFile): Date | null {
+  const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter as Record<string, unknown> | undefined;
+  for (const field of settings.dateField.split(",").map((item) => item.trim()).filter(Boolean)) {
+    const parsed = parseDateLike(frontmatter?.[field]);
+    if (isValidDate(parsed)) return parsed;
+  }
+  const fromName = parseDateInName(file.basename);
+  if (isValidDate(fromName)) return fromName;
+  if (settings.fallbackToFileDate) {
+    const fromTime = new Date(file.stat?.ctime ?? 0);
+    if (isValidDate(fromTime)) return fromTime;
+  }
+  return null;
+}
+
+/**
+ * 查找某一天已经存在的日记，供「写日记」入口复用。
+ * 这样即使文件名带后缀、用了别的日期格式，或日期写在 frontmatter 里，
+ * 也不会因为标准路径不存在而重复创建第二篇。
+ * 同一天有多篇时按最近修改时间降序，优先打开最近在写的那一篇。
+ */
+export function findDiariesForDate(app: App, settings: TimelineSettings, date: Date): TFile[] {
+  const key = toDateKey(date);
+  return candidateFiles(app, settings)
+    .filter((file) => {
+      const found = entryDateFor(app, settings, file);
+      return found !== null && toDateKey(found) === key;
+    })
+    .sort((a, b) => (b.stat?.mtime ?? b.stat?.ctime ?? 0) - (a.stat?.mtime ?? a.stat?.ctime ?? 0));
+}
+
 function stripFrontmatter(content: string): string {
   if (!content.startsWith("---")) return content;
   const end = content.indexOf("\n---", 3);
@@ -159,14 +209,7 @@ function extractTags(frontmatter: Record<string, unknown> | undefined, body: str
 
 async function buildEntry(app: App, settings: TimelineSettings, file: TFile): Promise<DiaryEntry | null> {
   const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter as Record<string, unknown> | undefined;
-  let date: Date | null = null;
-
-  for (const field of settings.dateField.split(",").map((item) => item.trim()).filter(Boolean)) {
-    date = parseDateLike(frontmatter?.[field]);
-    if (isValidDate(date)) break;
-  }
-  if (!isValidDate(date)) date = parseDateInName(file.basename);
-  if (!isValidDate(date) && settings.fallbackToFileDate) date = new Date(file.stat.ctime);
+  const date = entryDateFor(app, settings, file);
   if (!isValidDate(date)) return null;
 
   let content: string;
@@ -195,16 +238,7 @@ async function buildEntry(app: App, settings: TimelineSettings, file: TFile): Pr
 
 /** 扫描仓库并建立索引。分批读取内容，避免手机上一次性读几百个文件卡顿。 */
 export async function collectEntries(app: App, settings: TimelineSettings): Promise<DiaryEntry[]> {
-  const source = getDiarySource(app, settings);
-  const excludes = settings.excludeFolders
-    .split(",")
-    .map(cleanFolder)
-    .filter((item) => item.length > 0);
-
-  const files = app.vault.getMarkdownFiles().filter((file) => {
-    if (source.folder && !file.path.startsWith(`${source.folder}/`)) return false;
-    return !excludes.some((excluded) => file.path === excluded || file.path.startsWith(`${excluded}/`));
-  });
+  const files = candidateFiles(app, settings);
 
   const entries: DiaryEntry[] = [];
   const BATCH_SIZE = 25;

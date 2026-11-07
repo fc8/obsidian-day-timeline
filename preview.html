@@ -1377,7 +1377,7 @@ function calendarHTML() {
     const d = new Date(y, m, i - offset + 1);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const row = map.get(key);
-    cells += `<div class="lt-cal-cell${d.getMonth() !== m ? " is-outside" : ""}${row ? " has-note" : ""}${key === TODAY ? " is-today" : ""}" data-date="${key}" title="${key}${row ? " · 有日记" : " · 点击新建日记"}">
+    cells += `<div class="lt-cal-cell${d.getMonth() !== m ? " is-outside" : ""}${row ? " has-note" : ""}${key === TODAY ? " is-today" : ""}" data-date="${key}" title="${key}${row ? " · 有日记" : " · 点击写日记"}">
       ${row && row.images[0] ? `<img class="lt-cal-thumb" src="${row.images[0]}" alt="">` : ""}
       <div class="lt-cal-num">${d.getDate()}</div>
       <div class="lt-cal-dots">${row ? row.entries.slice(0, 3).map(() => '<span class="lt-cal-dot"></span>').join("") : ""}</div></div>`;
@@ -1391,7 +1391,7 @@ function calendarHTML() {
     </div>
     <div class="lt-cal-week">${["一", "二", "三", "四", "五", "六", "日"].map((w) => `<div class="lt-cal-weekday">${w}</div>`).join("")}</div>
     <div class="lt-cal-grid">${cells}</div>
-    <div class="lt-cal-legend">有圆点的日子写过日记 · 点空白日期可以新建这一天的日记</div>
+    <div class="lt-cal-legend">有圆点的日子写过日记 · 点空白日期可以写这一天的日记</div>
   </div>`;
 }
 
@@ -1428,9 +1428,9 @@ function bind() {
       toast(picked ? `随机打开：${picked.date} · ${picked.entries[0].title}` : "还没有找到日记");
     }
     else if (act === "refresh") { render(); toast("已重新读取 8 天 · 9 篇日记"); }
-    else if (act === "settings") toast("在 Obsidian → 设置 → 日记时间线 中打开");
+    else if (act === "settings") toast("静态预览不会打开设置面板；在 Obsidian 里点此按钮会直接跳到本插件设置页");
     else if (act === "reset") { state.mode = "timeline"; state.query = ""; state.year = ""; state.searchOpen = false; render(0); }
-    else if (act === "new") toast("会按 YYYY-MM-DD 创建并打开今天的日记");
+    else if (act === "new") toast("当天已有日记会直接打开，否则按 YYYY-MM-DD 创建");
     else if (act === "open") toast("会在新标签页打开这一天的日记");
     else if (act === "prev" || act === "next") { state.month = new Date(state.month.getFullYear(), state.month.getMonth() + (act === "next" ? 1 : -1), 1); render(0); }
     else if (act === "thisMonth") { state.month = new Date(2026, 10, 1); render(0); }

@@ -3,9 +3,9 @@ import type { ViewMode } from "./view";
 import { TimelineView, VIEW_TYPE_TIMELINE } from "./view";
 import { DEFAULT_SETTINGS, TimelineSettingTab } from "./settings";
 import type { TimelineSettings } from "./settings";
-import { collectEntries, diaryPathFor } from "./data";
+import { collectEntries, diaryPathFor, findDiariesForDate } from "./data";
 import type { DiaryEntry } from "./data";
-import { debounce, renderNoteTemplate } from "./utils";
+import { debounce, renderNoteTemplate, toDateKey } from "./utils";
 
 export default class DayTimelinePlugin extends Plugin {
   settings: TimelineSettings = { ...DEFAULT_SETTINGS };
@@ -96,12 +96,50 @@ export default class DayTimelinePlugin extends Plugin {
     }
   }
 
+  /**
+   * 打开本插件的设置页。Obsidian 没有提供公开 API，这里做多级回退，
+   * 避免内部 API 变化或移动端差异导致点击后毫无反应。
+   */
   openSettings(): void {
-    const setting = (this.app as unknown as {
-      setting?: { open?: () => void; openTabById?: (id: string) => void };
-    }).setting;
-    if (setting?.openTabById) setting.openTabById(this.manifest.id);
-    else setting?.open?.();
+    type SettingManager = {
+      open?: () => void;
+      openTabById?: (id: string) => void;
+      openTab?: (tab: unknown) => void;
+      settingTabs?: Array<{ id?: string }>;
+    };
+    const app = this.app as unknown as {
+      setting?: SettingManager;
+      commands?: { executeCommandById?: (id: string) => boolean };
+    };
+    const setting = app.setting;
+    let windowOpened = false;
+
+    try {
+      // 关键：必须先打开设置窗口；openTabById 只负责切换到指定标签页
+      if (setting?.open) {
+        setting.open();
+        windowOpened = true;
+      }
+      if (setting?.openTabById) {
+        setting.openTabById(this.manifest.id);
+      } else if (setting?.openTab && Array.isArray(setting.settingTabs)) {
+        const tab = setting.settingTabs.find((item) => item.id === this.manifest.id);
+        if (tab) setting.openTab(tab);
+      }
+    } catch (error) {
+      console.error("[Day Timeline] 打开插件设置失败", error);
+    }
+
+    // 兜底：内部 API 不可用时至少把设置窗口打开
+    if (!windowOpened) {
+      try {
+        const executed = app.commands?.executeCommandById?.("app:open-settings");
+        if (!executed) new Notice("请在「设置 → 第三方插件」中找到「日记时间线 Day Timeline」");
+      } catch (error) {
+        console.error("[Day Timeline] 打开设置窗口失败", error);
+        new Notice("请在「设置 → 第三方插件」中找到「日记时间线 Day Timeline」");
+      }
+    }
   }
 
   async activateView(mode: ViewMode = "timeline"): Promise<void> {
@@ -119,11 +157,27 @@ export default class DayTimelinePlugin extends Plugin {
     if (view && mode !== "timeline") view.setMode(mode);
   }
 
-  /** 打开（必要时创建）某一天的日记。 */
+  /** 当天已有日记则直接打开；确实没有时才按配置的日期格式新建。 */
   async createDiary(date: Date): Promise<void> {
     const path = diaryPathFor(this.app, this.settings, date);
-    let file = this.app.vault.getAbstractFileByPath(path);
-    if (!(file instanceof TFile)) {
+    const atPath = this.app.vault.getAbstractFileByPath(path);
+    let file: TFile | null = atPath instanceof TFile ? atPath : null;
+
+    if (!file) {
+      // 标准路径不存在不等于当天没写过：文件名带后缀、换了日期格式、
+      // 或日期写在 frontmatter 里的日记，都要按时间线的规则再找一次。
+      const existing = findDiariesForDate(this.app, this.settings, date);
+      if (existing.length > 0) {
+        file = existing[0];
+        new Notice(
+          existing.length > 1
+            ? `${toDateKey(date)} 已有 ${existing.length} 篇日记，已打开最近编辑的一篇`
+            : `已打开当天日记 ${file.basename}`,
+        );
+      }
+    }
+
+    if (!file) {
       await this.ensureParentFolder(path);
       const content = renderNoteTemplate(this.settings.noteTemplate, date);
       try {
@@ -135,7 +189,7 @@ export default class DayTimelinePlugin extends Plugin {
         return;
       }
     }
-    await this.app.workspace.getLeaf(true).openFile(file as TFile);
+    await this.app.workspace.getLeaf(true).openFile(file);
   }
 
   private async ensureParentFolder(path: string): Promise<void> {

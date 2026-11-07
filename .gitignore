@@ -4,3 +4,5 @@ node_modules/
 data.json
 archive/
 .workbuddy
+.tmp-*.cjs
+.tmp-entry.ts
